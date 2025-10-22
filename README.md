@@ -19,8 +19,6 @@
 
 ---
 
-Si tu veux, je peux te **mettre à jour tout ton README anglais** pour remplacer toutes les mentions de “vehicles and NPCs” partout afin que ce soit parfaitement clair et cohérent. Veux‑tu que je fasse ça ?
-
 
 💡 **Perfect for:**
 Here’s a polished version of your description with your additions integrated:
