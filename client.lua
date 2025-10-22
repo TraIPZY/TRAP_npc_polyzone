@@ -1,6 +1,7 @@
--- TRAP_npc_polyzone - client.lua
+-- Include la config
+-- Assurez-vous que config.lua est chargé avant ce client dans le fxmanifest
 
--- Fonction pour savoir si un point est dans un polygone
+-- Fonction pour vérifier si un point est dans un polygone
 local function isPointInPolygon(x, y, polygon)
     local inside = false
     local j = #polygon
@@ -14,54 +15,32 @@ local function isPointInPolygon(x, y, polygon)
     return inside
 end
 
--- Dessiner la polyzone en debug (mur vertical)
+-- Dessiner le mur vert pour le debug
 local function DrawPolyZone(zone)
     local points = zone.points
-    local zMin = 0.0    -- base du mur
-    local zMax = 12.0   -- hauteur du mur
-
+    local zMin, zMax = 0.0, 12.0
     for i = 1, #points do
         local startPoint = points[i]
         local endPoint = points[i % #points + 1]
-
-        -- Lignes verticales pour le mur
         for z = zMin, zMax, 1.0 do
             DrawLine(startPoint.x, startPoint.y, z, endPoint.x, endPoint.y, z, 0, 255, 0, 150)
         end
-
-        -- Markers au sommet des coins
-        DrawMarker(2, startPoint.x, startPoint.y, zMax, 0, 0, 0, 0, 0, 0, 0.3, 0.3, 0.3, 0, 255, 0, 150, false, true, 2, false, nil, nil, false)
     end
 end
 
--- Fonction pour récupérer les occupants d'un véhicule
-local function GetVehicleOccupants(vehicle)
-    local occupants = {}
-    for seat = -1, GetVehicleMaxNumberOfPassengers(vehicle) - 1 do
-        local ped = GetPedInVehicleSeat(vehicle, seat)
-        if ped and ped ~= 0 then
-            table.insert(occupants, ped)
-        end
-    end
-    return occupants
-end
-
--- Thread principal pour nettoyer les polyzones
+-- Thread principal pour nettoyer les NPC
 CreateThread(function()
     while true do
         local sleep = 500
         if Config.Debug then sleep = 0 end
 
-        for zoneName, zone in pairs(Config.PolyZones) do
+        for _, zone in pairs(Config.PolyZones) do
 
-            -- Supprimer véhicules NPC seulement
+            -- Supprimer véhicules NPC
             if zone.clearVehicles then
                 for _, veh in pairs(GetGamePool("CVehicle")) do
                     local driver = GetPedInVehicleSeat(veh, -1)
-                    local owner = NetworkGetEntityOwner(veh)
-
-                    -- Supprime uniquement si c'est un véhicule NPC / spawn random
-                    if (driver == 0 or not IsPedAPlayer(driver)) and (not owner or owner == -1) then
+                    if driver == 0 or not IsPedAPlayer(driver) then
                         local vx, vy, vz = table.unpack(GetEntityCoords(veh))
                         if isPointInPolygon(vx, vy, zone.points) then
                             DeleteEntity(veh)
@@ -70,7 +49,7 @@ CreateThread(function()
                 end
             end
 
-            -- Supprimer peds NPC seulement
+            -- Supprimer Peds NPC
             if zone.clearPeds then
                 for _, ped in pairs(GetGamePool("CPed")) do
                     if not IsPedAPlayer(ped) then
