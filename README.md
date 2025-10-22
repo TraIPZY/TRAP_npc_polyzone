@@ -16,10 +16,20 @@
 * Configure multiple zones with **independent options**.
 
 💡 **Perfect for:**
+Here’s a polished version of your description with your additions integrated:
+
+---
+
+**Perfect for:**
 
 * Garages or RP shops to prevent NPCs or stray vehicles.
 * Secure zones for RP missions or events.
-* Precise entity control for enhanced RP immersion.
+* Precisely controlling entities for enhanced RP immersion.
+* Removing wandering NPCs in an MLO or any area.
+
+---
+
+If you want, I can also rewrite it in a slightly **more professional GitHub style** for your README, so it reads even cleaner and enticing. Do you want me to do that?
 
 ---
 
