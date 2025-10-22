@@ -9,11 +9,18 @@
 ## 🔹 Description
 
 **TRAP_npc_polyzone** is a **script** for **FiveM** that allows you to:
+---
+**TRAP_npc_polyzone** is a script for FiveM that allows you to:
 
-* Easily create **custom polygons (polyzones)** in-game.
-* **Automatically clean** vehicles and NPCs inside the zone.
-* **Visualize zones** in real-time with green walls and corner markers.
-* Configure multiple zones with **independent options**.
+* Easily create custom polygons (polyzones) in-game.
+* Automatically clean **vehicles and peds (NPCs)** inside the zone.
+* Visualize zones in real-time with green walls and corner markers.
+* Configure multiple zones with independent options.
+
+---
+
+Si tu veux, je peux te **mettre à jour tout ton README anglais** pour remplacer toutes les mentions de “vehicles and NPCs” partout afin que ce soit parfaitement clair et cohérent. Veux‑tu que je fasse ça ?
+
 
 💡 **Perfect for:**
 Here’s a polished version of your description with your additions integrated:
