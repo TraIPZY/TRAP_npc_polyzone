@@ -19,23 +19,12 @@
 
 ---
 
-
-💡 **Perfect for:**
-Here’s a polished version of your description with your additions integrated:
-
----
-
 **Perfect for:**
 
 * Garages or RP shops to prevent NPCs or stray vehicles.
 * Secure zones for RP missions or events.
 * Precisely controlling entities for enhanced RP immersion.
 * Removing wandering NPCs in an MLO or any area.
-
----
-
-If you want, I can also rewrite it in a slightly **more professional GitHub style** for your README, so it reads even cleaner and enticing. Do you want me to do that?
-
 ---
 
 ## 🔹 Features
@@ -64,17 +53,22 @@ If you want, I can also rewrite it in a slightly **more professional GitHub styl
 ## 🔹 Example Configuration
 
 ```lua
+Config = {}
+
+-- Active ou désactive le debug (mur vert en jeu)
+Config.Debug = true
+
+-- Définir toutes les polyzones ici
 Config.PolyZones = {
-test = {
+    MechanicThunderShop = {
+        clearVehicles = true, -- supprimer véhicules NPC
+        clearPeds = true,     -- supprimer peds NPC
         points = {
-            {x = -2054.48, y = -432.36},
-            {x = -1989.66, y = -485.78},
-            {x = -2051.72, y = -562.86},
-            {x = -2120.67, y = -510.32}
-        },
-        clearVehicles = true,
-        clearPeds = true,
-        radiusCheck = 150.0
+            {x = -2054.4846, y = -432.3635, z = 11.5195},
+            {x = -1989.6630, y = -485.7856, z = 11.6392},
+            {x = -2051.7283, y = -562.8635, z = 5.6088},
+            {x = -2120.6768, y = -510.3206, z = 2.3494}
+        }
     }
 }
 ```
@@ -110,7 +104,7 @@ test = {
 
 ## 🔹 License
 
-MIT License – free to use and modify for your RP servers.
+MIT License 
 
 ---
 
