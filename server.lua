@@ -1,0 +1,2 @@
+-- Serveur vide pour l’instant, prêt pour futur usage
+-- Exemple : notifications, log des suppressions, etc.
