@@ -1,3 +1,5 @@
+-- TRAP_npc_polyzone - client.lua
+
 -- Fonction pour savoir si un point est dans un polygone
 local function isPointInPolygon(x, y, polygon)
     local inside = false
@@ -15,7 +17,7 @@ end
 -- Récupérer les véhicules proches
 local function GetNearbyVehicles(coords, radius)
     local nearby = {}
-    local vehicles = GetGamePool("CVehicle") -- <-- correction ici
+    local vehicles = GetGamePool("CVehicle")
     for _, veh in pairs(vehicles) do
         local vx, vy, vz = table.unpack(GetEntityCoords(veh))
         if #(vector3(vx, vy, vz) - coords) <= radius then
@@ -28,7 +30,7 @@ end
 -- Récupérer les peds proches
 local function GetNearbyPeds(coords, radius)
     local nearby = {}
-    local peds = GetGamePool("CPed") -- <-- correction ici
+    local peds = GetGamePool("CPed")
     for _, ped in pairs(peds) do
         if not IsPedAPlayer(ped) then
             local px, py, pz = table.unpack(GetEntityCoords(ped))
@@ -40,22 +42,22 @@ local function GetNearbyPeds(coords, radius)
     return nearby
 end
 
--- Dessiner la polyzone en debug
+-- Dessiner la polyzone en debug (mur vertical)
 local function DrawPolyZone(zone)
     local points = zone.points
-    local zMin = 0.0    -- base de la zone
-    local zMax = 70.0   -- hauteur de la zone
+    local zMin = 0.0    -- base du mur
+    local zMax = 70.0   -- hauteur du mur
 
     for i = 1, #points do
         local startPoint = points[i]
         local endPoint = points[i % #points + 1]
 
-        -- Dessine des lignes verticales pour chaque coin
+        -- Lignes verticales pour le mur
         for z = zMin, zMax, 1.0 do
             DrawLine(startPoint.x, startPoint.y, z, endPoint.x, endPoint.y, z, 0, 255, 0, 150)
         end
 
-        -- Dessine un petit marker au sommet de chaque coin
+        -- Markers au sommet des coins
         DrawMarker(2, startPoint.x, startPoint.y, zMax, 0, 0, 0, 0, 0, 0, 0.3, 0.3, 0.3, 0, 255, 0, 150, false, true, 2, false, nil, nil, false)
     end
 end
@@ -77,18 +79,24 @@ CreateThread(function()
             centerY = centerY / #zone.points
             local center = vector3(centerX, centerY, 0)
 
-            -- Supprimer véhicules
+            -- Supprimer véhicules NPC seulement
             if zone.clearVehicles then
                 local nearbyVehicles = GetNearbyVehicles(center, zone.radiusCheck)
                 for _, veh in pairs(nearbyVehicles) do
-                    local vx, vy, vz = table.unpack(GetEntityCoords(veh))
-                    if isPointInPolygon(vx, vy, zone.points) then
-                        DeleteEntity(veh)
+                    -- Supprime uniquement si le véhicule n'a **aucun joueur** dedans
+                    -- et n'est pas un véhicule contrôlé par un joueur
+                    local driver = GetPedInVehicleSeat(veh, -1)
+                    local owner = NetworkGetEntityOwner(veh)
+                    if (driver == 0 or not IsPedAPlayer(driver)) and (not owner or owner == -1) then
+                        local vx, vy, vz = table.unpack(GetEntityCoords(veh))
+                        if isPointInPolygon(vx, vy, zone.points) then
+                            DeleteEntity(veh)
+                        end
                     end
                 end
             end
 
-            -- Supprimer peds
+            -- Supprimer peds NPC
             if zone.clearPeds then
                 local nearbyPeds = GetNearbyPeds(center, zone.radiusCheck)
                 for _, ped in pairs(nearbyPeds) do
@@ -104,6 +112,7 @@ CreateThread(function()
                 DrawPolyZone(zone)
             end
         end
+
         Wait(sleep)
     end
 end)
