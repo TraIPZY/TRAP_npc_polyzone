@@ -60,7 +60,7 @@ If you want, I can also rewrite it in a slightly **more professional GitHub styl
 
 ```lua
 Config.PolyZones = {
-    MechanicThunderShop = {
+test = {
         points = {
             {x = -2054.48, y = -432.36},
             {x = -1989.66, y = -485.78},
