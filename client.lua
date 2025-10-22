@@ -14,39 +14,11 @@ local function isPointInPolygon(x, y, polygon)
     return inside
 end
 
--- Récupérer les véhicules proches
-local function GetNearbyVehicles(coords, radius)
-    local nearby = {}
-    local vehicles = GetGamePool("CVehicle")
-    for _, veh in pairs(vehicles) do
-        local vx, vy, vz = table.unpack(GetEntityCoords(veh))
-        if #(vector3(vx, vy, vz) - coords) <= radius then
-            table.insert(nearby, veh)
-        end
-    end
-    return nearby
-end
-
--- Récupérer les peds proches
-local function GetNearbyPeds(coords, radius)
-    local nearby = {}
-    local peds = GetGamePool("CPed")
-    for _, ped in pairs(peds) do
-        if not IsPedAPlayer(ped) then
-            local px, py, pz = table.unpack(GetEntityCoords(ped))
-            if #(vector3(px, py, pz) - coords) <= radius then
-                table.insert(nearby, ped)
-            end
-        end
-    end
-    return nearby
-end
-
 -- Dessiner la polyzone en debug (mur vertical)
 local function DrawPolyZone(zone)
     local points = zone.points
     local zMin = 0.0    -- base du mur
-    local zMax = 70.0   -- hauteur du mur
+    local zMax = 12.0   -- hauteur du mur
 
     for i = 1, #points do
         local startPoint = points[i]
@@ -62,6 +34,18 @@ local function DrawPolyZone(zone)
     end
 end
 
+-- Fonction pour récupérer les occupants d'un véhicule
+local function GetVehicleOccupants(vehicle)
+    local occupants = {}
+    for seat = -1, GetVehicleMaxNumberOfPassengers(vehicle) - 1 do
+        local ped = GetPedInVehicleSeat(vehicle, seat)
+        if ped and ped ~= 0 then
+            table.insert(occupants, ped)
+        end
+    end
+    return occupants
+end
+
 -- Thread principal pour nettoyer les polyzones
 CreateThread(function()
     while true do
@@ -69,24 +53,14 @@ CreateThread(function()
         if Config.Debug then sleep = 0 end
 
         for zoneName, zone in pairs(Config.PolyZones) do
-            -- Centre approximatif pour filtrer les entités proches
-            local centerX, centerY = 0, 0
-            for _, point in pairs(zone.points) do
-                centerX = centerX + point.x
-                centerY = centerY + point.y
-            end
-            centerX = centerX / #zone.points
-            centerY = centerY / #zone.points
-            local center = vector3(centerX, centerY, 0)
 
             -- Supprimer véhicules NPC seulement
             if zone.clearVehicles then
-                local nearbyVehicles = GetNearbyVehicles(center, zone.radiusCheck)
-                for _, veh in pairs(nearbyVehicles) do
-                    -- Supprime uniquement si le véhicule n'a **aucun joueur** dedans
-                    -- et n'est pas un véhicule contrôlé par un joueur
+                for _, veh in pairs(GetGamePool("CVehicle")) do
                     local driver = GetPedInVehicleSeat(veh, -1)
                     local owner = NetworkGetEntityOwner(veh)
+
+                    -- Supprime uniquement si c'est un véhicule NPC / spawn random
                     if (driver == 0 or not IsPedAPlayer(driver)) and (not owner or owner == -1) then
                         local vx, vy, vz = table.unpack(GetEntityCoords(veh))
                         if isPointInPolygon(vx, vy, zone.points) then
@@ -96,13 +70,14 @@ CreateThread(function()
                 end
             end
 
-            -- Supprimer peds NPC
+            -- Supprimer peds NPC seulement
             if zone.clearPeds then
-                local nearbyPeds = GetNearbyPeds(center, zone.radiusCheck)
-                for _, ped in pairs(nearbyPeds) do
-                    local px, py, pz = table.unpack(GetEntityCoords(ped))
-                    if isPointInPolygon(px, py, zone.points) then
-                        DeleteEntity(ped)
+                for _, ped in pairs(GetGamePool("CPed")) do
+                    if not IsPedAPlayer(ped) then
+                        local px, py, pz = table.unpack(GetEntityCoords(ped))
+                        if isPointInPolygon(px, py, zone.points) then
+                            DeleteEntity(ped)
+                        end
                     end
                 end
             end
