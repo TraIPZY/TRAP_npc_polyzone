@@ -18,7 +18,7 @@ end
 -- Dessiner le mur vert pour le debug
 local function DrawPolyZone(zone)
     local points = zone.points
-    local zMin, zMax = 0.0, 12.0
+    local zMin, zMax = 0.0, 50.0
     for i = 1, #points do
         local startPoint = points[i]
         local endPoint = points[i % #points + 1]
@@ -31,7 +31,7 @@ end
 -- Thread principal pour nettoyer les NPC
 CreateThread(function()
     while true do
-        local sleep = 500
+        local sleep = 1000
         if Config.Debug then sleep = 0 end
 
         for _, zone in pairs(Config.PolyZones) do
@@ -40,7 +40,10 @@ CreateThread(function()
             if zone.clearVehicles then
                 for _, veh in pairs(GetGamePool("CVehicle")) do
                     local driver = GetPedInVehicleSeat(veh, -1)
-                    if driver == 0 or not IsPedAPlayer(driver) then
+                    local owner = NetworkGetEntityOwner(veh)
+
+                    -- Supprimer seulement si véhicule NPC (pas de joueur dedans et pas possédé par un joueur)
+                    if (driver == 0 or not IsPedAPlayer(driver)) and (not owner or owner == -1) then
                         local vx, vy, vz = table.unpack(GetEntityCoords(veh))
                         if isPointInPolygon(vx, vy, zone.points) then
                             DeleteEntity(veh)
