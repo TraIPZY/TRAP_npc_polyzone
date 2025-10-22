@@ -8,7 +8,7 @@
 
 ## 🔹 Description
 
-**TRAP_npc_polyzone** is a **client/server script** for **FiveM** that allows you to:
+**TRAP_npc_polyzone** is a **script** for **FiveM** that allows you to:
 
 * Easily create **custom polygons (polyzones)** in-game.
 * **Automatically clean** vehicles and NPCs inside the zone.
