@@ -60,7 +60,7 @@ Config.Debug = true
 
 -- Définir toutes les polyzones ici
 Config.PolyZones = {
-    MechanicThunderShop = {
+    test = {
         clearVehicles = true, -- supprimer véhicules NPC
         clearPeds = true,     -- supprimer peds NPC
         points = {
